@@ -1,33 +1,11 @@
-import { Redis } from 'redis'
+import { createClient } from 'redis'
 
 // Redis client configuration
 const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379'
 
 // Create Redis client
-export const redis = new Redis(redisUrl, {
-  // Connection options
-  retry_strategy: (options) => {
-    if (options.error && options.error.code === 'ECONNREFUSED') {
-      console.error('Redis connection refused')
-      return new Error('Redis connection refused')
-    }
-    if (options.total_retry_time > 1000 * 60 * 60) {
-      console.error('Redis retry time exhausted')
-      return new Error('Retry time exhausted')
-    }
-    if (options.attempt > 10) {
-      console.error('Redis max attempts reached')
-      return new Error('Max attempts reached')
-    }
-    // Reconnect after
-    return Math.min(options.attempt * 100, 3000)
-  },
-  // Enable offline queue
-  enable_offline_queue: true,
-  // Max retries per request
-  maxRetriesPerRequest: 3,
-  // Lazy connect (connect when first command is executed)
-  lazyConnect: true,
+export const redis = createClient({
+  url: redisUrl,
 })
 
 // Redis event handlers
@@ -69,7 +47,7 @@ export class RedisCache {
   async set(key: string, value: string, ttl?: number): Promise<boolean> {
     try {
       if (ttl) {
-        await redis.setex(this.prefix + key, ttl, value)
+        await redis.setEx(this.prefix + key, ttl, value)
       } else {
         await redis.set(this.prefix + key, value)
       }
@@ -168,7 +146,7 @@ export class RedisCache {
   // Cleanup (for testing)
   async flushAll(): Promise<boolean> {
     try {
-      await redis.flushall()
+      await redis.flushAll()
       return true
     } catch (error) {
       console.error('Redis FLUSHALL error:', error)

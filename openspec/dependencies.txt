@@ -1,0 +1,94 @@
+# Mental Health Support Platform - Dependencies
+
+## Core Framework
+next@15.0.0
+react@19.0.0
+react-dom@19.0.0
+typescript@5.3.0
+
+## UI & Styling
+@radix-ui/react-dialog@latest
+@radix-ui/react-dropdown-menu@latest
+@radix-ui/react-select@latest
+@radix-ui/react-toast@latest
+@radix-ui/react-tabs@latest
+@radix-ui/react-avatar@latest
+@radix-ui/react-progress@latest
+@radix-ui/react-slider@latest
+tailwindcss@3.4.0
+autoprefixer@10.4.0
+postcss@8.4.0
+lucide-react@0.344.0
+class-variance-authority@0.7.0
+clsx@2.1.0
+tailwind-merge@2.2.0
+
+## State Management
+zustand@4.5.0
+@tanstack/react-query@5.17.0
+
+## Forms & Validation
+react-hook-form@7.49.0
+@hookform/resolvers@3.3.0
+zod@3.22.0
+
+## Database & ORM
+prisma@5.7.0
+@prisma/client@5.7.0
+
+## Authentication
+next-auth@5.0.0
+
+## API & Backend
+@trpc/server@11.0.0
+@trpc/client@11.0.0
+@trpc/react-query@11.0.0
+@trpc/next@11.0.0
+superjson@2.2.0
+
+## AI Integration
+ai@3.0.0
+openai@4.28.0
+@google/generative-ai@0.11.0
+
+## Security & Utils
+bcryptjs@2.4.3
+jsonwebtoken@9.0.0
+rate-limiter-flexible@3.0.0
+uuid@9.0.0
+
+## Development Tools
+eslint@8.57.0
+eslint-config-next@14.1.0
+prettier@3.2.0
+husky@9.0.0
+lint-staged@15.2.0
+@turborepo/cli@latest
+
+## Testing
+vitest@1.2.0
+@testing-library/react@14.2.0
+@testing-library/jest-dom@6.4.0
+@testing-library/user-event@14.5.0
+msw@2.2.0
+
+## Mobile (Expo/React Native)
+expo@50.0.0
+react-native@0.73.0
+expo-router@3.4.0
+expo-status-bar@1.11.0
+expo-notifications@0.27.0
+expo-secure-store@12.8.0
+@react-native-async-storage/async-storage@1.21.0
+
+## DevOps & Deployment
+vercel@33.0.0
+
+## Monitoring & Analytics
+@sentry/nextjs@8.0.0
+
+## Optional/Production
+redis@4.6.0
+@aws-sdk/client-s3@3.490.0
+stripe@14.0.0
+nodemailer@6.9.0

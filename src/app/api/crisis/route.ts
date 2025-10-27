@@ -155,11 +155,31 @@ export async function PUT(
       },
     });
 
-    // TODO: Implement escalation actions based on status change
-    // - Send notifications
-    // - Contact emergency services for critical cases
-    // - Update user flags
-    // - Log intervention actions
+    // Implement escalation actions based on status change
+    if (validatedData.status === 'ESCALATED') {
+      // Send notifications to crisis team
+      console.log(`Crisis event ${params.id} escalated. Notifying crisis team.`);
+      // TODO: Implement actual notification system (email, SMS, etc.)
+
+      // Update user crisis flag if critical
+      if (updatedEvent.flagLevel === 'CRITICAL') {
+        await prisma.user.update({
+          where: { id: updatedEvent.userId },
+          data: { crisisFlag: true }
+        });
+      }
+    } else if (validatedData.status === 'RESOLVED') {
+      // Clear user crisis flag
+      await prisma.user.update({
+        where: { id: updatedEvent.userId },
+        data: { crisisFlag: false }
+      });
+
+      console.log(`Crisis event ${params.id} resolved. User crisis flag cleared.`);
+    }
+
+    // Log intervention actions
+    console.log(`Crisis event ${params.id} updated by ${session.user.id}: ${validatedData.status}`);
 
     return NextResponse.json({
       event: {

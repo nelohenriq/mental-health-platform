@@ -10,7 +10,7 @@ const updateExerciseSchema = z.object({
   category: z.enum(['THOUGHT_CHALLENGING', 'BEHAVIOR_ACTIVATION', 'RELAXATION', 'MINDFULNESS', 'COGNITIVE_RESTRUCTURING', 'EXPOSURE', 'PROBLEM_SOLVING', 'COMMUNICATION']).optional(),
   difficulty: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']).optional(),
   content: z.any().optional(),
-  mediaUrls: z.array(z.string()).optional(),
+  mediaUrls: z.string().optional(),
   isActive: z.boolean().optional(),
 });
 
@@ -64,9 +64,6 @@ export async function PUT(
     }
 
     const updateData: any = { ...validatedData };
-    if (validatedData.mediaUrls) {
-      updateData.mediaUrls = JSON.stringify(validatedData.mediaUrls);
-    }
 
     // Increment version if content changes
     if (validatedData.content || validatedData.title || validatedData.description) {

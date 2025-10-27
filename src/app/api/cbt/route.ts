@@ -10,7 +10,7 @@ const createExerciseSchema = z.object({
   category: z.enum(['THOUGHT_CHALLENGING', 'BEHAVIOR_ACTIVATION', 'RELAXATION', 'MINDFULNESS', 'COGNITIVE_RESTRUCTURING', 'EXPOSURE', 'PROBLEM_SOLVING', 'COMMUNICATION']),
   difficulty: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']),
   content: z.string(),
-  mediaUrls: z.array(z.string()).optional(),
+  mediaUrls: z.string().optional(),
 });
 
 // GET /api/cbt - Get CBT exercises
@@ -55,7 +55,6 @@ export async function POST(request: NextRequest) {
     const exercise = await prisma.cBTExercise.create({
       data: {
         ...validatedData,
-        mediaUrls: validatedData.mediaUrls ? JSON.stringify(validatedData.mediaUrls) : null,
         createdBy: session.user.id,
       },
     });

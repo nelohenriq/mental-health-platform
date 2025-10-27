@@ -4,13 +4,11 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { getPersonalizationEngine } from '@/lib/ai/personalization';
 
-import { CBTExerciseCategory } from '@prisma/client';
-
 interface CBTRecommendation {
   id: string;
   title: string;
   description: string | null;
-  category: CBTExerciseCategory;
+  category: string;
   difficulty: string;
 }
 
@@ -88,7 +86,7 @@ export async function GET(request: NextRequest) {
       });
 
       // Determine recommended categories based on mood and completion history
-      let recommendedCategories: CBTExerciseCategory[] = [];
+      let recommendedCategories: string[] = [];
 
       if (avgMood < 4) {
         recommendedCategories = ['BEHAVIOR_ACTIVATION', 'RELAXATION', 'MINDFULNESS'];

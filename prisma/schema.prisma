@@ -3,31 +3,42 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
 // User model
 model User {
-  id        String      @id @default(cuid())
-  email     String      @unique
+  id        String   @id @default(cuid())
+  email     String   @unique
   name      String?
   password  String
   image     String?
-  role      UserRole    @default(USER)
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  role      String   @default("USER")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Mental health specific fields
-  crisisFlag         Boolean       @default(false)
-  privacyMode        PrivacyMode   @default(STANDARD)
-  onboardingCompleted Boolean      @default(false)
+  crisisFlag          Boolean @default(false)
+  privacyMode         String  @default("STANDARD")
+  onboardingCompleted Boolean @default(false)
 
   // Relations
-  moodEntries      MoodEntry[]
-  conversations    Conversation[]
-  cbtSessions      CBTSession[]
-  crisisEvents     CrisisEvent[] // Added to fix relation
+  moodEntries           MoodEntry[]
+  conversations         Conversation[]
+  cbtSessions           CBTSession[]
+  crisisEvents          CrisisEvent[]
+  emergencyContacts     EmergencyContact[]
+  professionalReferrals ProfessionalReferral[]
+  behaviorEvents        UserBehaviorEvent[]
+  segmentMemberships    UserSegmentMembership[]
+  abTestAssignments     ABTestAssignment[]
+  retentionPredictions  RetentionPrediction[]
+  engagementScore       UserEngagementScore?
+  predictiveAlerts      PredictiveAlert[]
+  dataSubjectRequests   DataSubjectRequest[]
+  consentRecords        ConsentRecord[]
+  dataProcessingRecords DataProcessingRecord[]
 
   @@map("users")
 }
@@ -37,9 +48,9 @@ model MoodEntry {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  moodLevel Int      // 1-10 scale
+  moodLevel Int // 1-10 scale
   notes     String?
-  factors   String?  // Store JSON array of mood factors as string
+  factors   String? // Store JSON array of mood factors as string
   timestamp DateTime @default(now())
 
   @@map("mood_entries")
@@ -47,16 +58,16 @@ model MoodEntry {
 
 // Conversation model
 model Conversation {
-  id              String        @id @default(cuid())
-  userId          String
-  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sessionContext  String?       // JSON context for AI conversation
-  startAt         DateTime      @default(now())
-  endAt           DateTime?
-  crisisDetected  Boolean       @default(false)
+  id             String    @id @default(cuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionContext String? // JSON context for AI conversation
+  startAt        DateTime  @default(now())
+  endAt          DateTime?
+  crisisDetected Boolean   @default(false)
 
   // Relations
-  messages        Message[]
+  messages Message[]
 
   @@map("conversations")
 }
@@ -66,7 +77,7 @@ model Message {
   id             String       @id @default(cuid())
   conversationId String
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  role           MessageRole
+  role           String
   content        String
   timestamp      DateTime     @default(now())
 
@@ -75,44 +86,44 @@ model Message {
 
 // CBTExercise model
 model CBTExercise {
-  id          String        @id @default(cuid())
+  id          String    @id @default(cuid())
   title       String
   description String?
-  category    CBTExerciseCategory
-  difficulty  CBTExerciseDifficulty
-  content     String        // JSON content for the exercise structure
-  mediaUrls   String?       // JSON array of media URLs
-  isActive    Boolean       @default(true)
-  status      CBTContentStatus @default(DRAFT)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  createdBy   String        // Admin user ID who created it
-  reviewedBy  String?       // Admin user ID who reviewed it
+  category    String
+  difficulty  String
+  content     String // JSON content for the exercise structure
+  mediaUrls   String? // JSON array of media URLs
+  isActive    Boolean   @default(true)
+  status      String    @default("DRAFT")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  createdBy   String // Admin user ID who created it
+  reviewedBy  String? // Admin user ID who reviewed it
   reviewedAt  DateTime?
-  version     Int           @default(1)
+  version     Int       @default(1)
 
   // Relations
-  sessions    CBTSession[]
-  versions    CBTExerciseVersion[]
+  sessions CBTSession[]
+  versions CBTExerciseVersion[]
 
   @@map("cbt_exercises")
 }
 
 // CBTExerciseVersion model for version history
 model CBTExerciseVersion {
-  id          String   @id @default(cuid())
+  id          String      @id @default(cuid())
   exerciseId  String
   exercise    CBTExercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
   version     Int
   title       String
   description String?
-  category    CBTExerciseCategory
-  difficulty  CBTExerciseDifficulty
+  category    String
+  difficulty  String
   content     String
-  mediaUrls   String?
-  changes     String?  // Description of what changed
+  mediaUrls   String? // JSON array of media URLs
+  changes     String? // Description of what changed
   createdBy   String
-  createdAt   DateTime @default(now())
+  createdAt   DateTime    @default(now())
 
   @@unique([exerciseId, version])
   @@map("cbt_exercise_versions")
@@ -120,91 +131,383 @@ model CBTExerciseVersion {
 
 // CBTSession model
 model CBTSession {
-  id            String     @id @default(cuid())
-  userId        String
-  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  exerciseId    String
-  exercise      CBTExercise @relation(fields: [exerciseId], references: [id])
-  progress      String     // JSON progress data
-  isCompleted   Boolean    @default(false)
-  startedAt     DateTime   @default(now())
-  completedAt   DateTime?
-  score         Int?       // Optional score for exercises
+  id          String      @id @default(cuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exerciseId  String
+  exercise    CBTExercise @relation(fields: [exerciseId], references: [id])
+  progress    String // JSON progress data
+  isCompleted Boolean     @default(false)
+  startedAt   DateTime    @default(now())
+  completedAt DateTime?
+  score       Int? // Optional score for exercises
 
+  @@unique([userId, exerciseId])
   @@map("cbt_sessions")
 }
 
 // CrisisEvent model
 model CrisisEvent {
-  id                String           @id @default(cuid())
-  userId            String
-  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  source            CrisisSource
-  detectedAt        DateTime         @default(now())
-  flagLevel         CrisisLevel
-  escalationStatus  EscalationStatus @default(PENDING)
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  source           String
+  detectedAt       DateTime @default(now())
+  flagLevel        String
+  escalationStatus String   @default("PENDING")
+  notes            String? // JSON string containing crisis details
+
+  // Relations
+  referrals ProfessionalReferral[]
 
   @@map("crisis_events")
 }
 
+// A/B Testing Framework
+model ABTest {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  feature     String // Feature being tested (e.g., 'mood_tracking_ui', 'cbt_exercise_flow')
+  status      String    @default("DRAFT") // DRAFT, ACTIVE, COMPLETED, CANCELLED
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  variants    ABTestVariant[]
+  assignments ABTestAssignment[]
+
+  @@map("ab_tests")
+}
+
+model ABTestVariant {
+  id          String   @id @default(cuid())
+  testId      String
+  test        ABTest   @relation(fields: [testId], references: [id], onDelete: Cascade)
+  name        String // Variant name (e.g., 'control', 'variant_a', 'variant_b')
+  description String?
+  config      String // JSON configuration for this variant
+  weight      Int      @default(1) // Relative weight for traffic distribution
+  isControl   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  // Relations
+  assignments ABTestAssignment[]
+
+  @@unique([testId, name])
+  @@map("ab_test_variants")
+}
+
+model ABTestAssignment {
+  id         String        @id @default(cuid())
+  testId     String
+  test       ABTest        @relation(fields: [testId], references: [id], onDelete: Cascade)
+  variantId  String
+  variant    ABTestVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assignedAt DateTime      @default(now())
+
+  // Relations
+  events ABTestEvent[]
+
+  @@unique([testId, userId])
+  @@map("ab_test_assignments")
+}
+
+model ABTestEvent {
+  id           String           @id @default(cuid())
+  assignmentId String
+  assignment   ABTestAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  eventType    String // Event type (e.g., 'click', 'conversion', 'engagement')
+  eventName    String // Specific event name
+  properties   String? // JSON event properties
+  timestamp    DateTime         @default(now())
+
+  @@map("ab_test_events")
+}
+
+// Predictive Analytics Models
+model RetentionPrediction {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  prediction Float // Probability score (0-1)
+  riskLevel  String // LOW, MEDIUM, HIGH, CRITICAL
+  factors    String // JSON array of contributing factors
+  timeframe  String // 7d, 30d, 90d
+  createdAt  DateTime @default(now())
+  expiresAt  DateTime // When prediction expires
+
+  @@unique([userId, timeframe])
+  @@map("retention_predictions")
+}
+
+model UserEngagementScore {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  score          Float // Engagement score (0-100)
+  components     String // JSON breakdown of score components
+  trend          String // IMPROVING, STABLE, DECLINING
+  lastActivityAt DateTime
+  calculatedAt   DateTime @default(now())
+
+  @@unique([userId])
+  @@map("user_engagement_scores")
+}
+
+model PredictiveAlert {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  alertType  String // RETENTION_RISK, ENGAGEMENT_DROP, MOOD_DECLINE, etc.
+  severity   String // LOW, MEDIUM, HIGH, CRITICAL
+  message    String
+  actions    String // JSON array of recommended actions
+  status     String    @default("ACTIVE") // ACTIVE, RESOLVED, DISMISSED
+  createdAt  DateTime  @default(now())
+  resolvedAt DateTime?
+
+  @@map("predictive_alerts")
+}
+
+// UserBehaviorEvent model for analytics
+model UserBehaviorEvent {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventType  String // page_view, button_click, feature_usage, etc.
+  eventName  String // specific event identifier
+  properties String? // JSON string of event properties
+  sessionId  String? // Session tracking
+  timestamp  DateTime @default(now())
+  userAgent  String?
+  ipAddress  String?
+
+  @@map("user_behavior_events")
+}
+
+// UserSegment model for cohort analysis
+model UserSegment {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  criteria    String // JSON criteria for segment membership
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  users UserSegmentMembership[]
+
+  @@map("user_segments")
+}
+
+// UserSegmentMembership model
+model UserSegmentMembership {
+  id        String      @id @default(cuid())
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  segmentId String
+  segment   UserSegment @relation(fields: [segmentId], references: [id], onDelete: Cascade)
+  joinedAt  DateTime    @default(now())
+
+  @@unique([userId, segmentId])
+  @@map("user_segment_memberships")
+}
+
+// EmergencyContact model
+model EmergencyContact {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String
+  relationship String
+  phone        String
+  email        String?
+  isPrimary    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([userId, isPrimary], name: "emergency_contact_primary")
+  @@map("emergency_contacts")
+}
+
+// InterventionProtocol model
+model InterventionProtocol {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  severity    String // CRITICAL, HIGH, MEDIUM, LOW
+  steps       String // JSON array of intervention steps
+  resources   String? // JSON array of resource links
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("intervention_protocols")
+}
+
+// ProfessionalReferral model
+model ProfessionalReferral {
+  id               String       @id @default(cuid())
+  userId           String
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  crisisEventId    String?
+  crisisEvent      CrisisEvent? @relation(fields: [crisisEventId], references: [id])
+  professionalType String // THERAPIST, PSYCHIATRIST, COUNSELOR, etc.
+  urgency          String // IMMEDIATE, URGENT, ROUTINE
+  status           String       @default("PENDING") // PENDING, CONTACTED, SCHEDULED, COMPLETED
+  notes            String?
+  referredAt       DateTime     @default(now())
+  contactedAt      DateTime?
+  completedAt      DateTime?
+
+  @@map("professional_referrals")
+}
+
+// AnonymizedAnalytics model for privacy-preserving analytics
+model AnonymizedAnalytics {
+  id            String   @id @default(cuid())
+  userId        String
+  anonymousId   String
+  encryptedData String
+  anonymizedAt  DateTime @default(now())
+
+  @@map("anonymized_analytics")
+}
+
+// HIPAA Compliance Audit Models
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String
+  action     String
+  resource   String
+  resourceId String?
+  ipAddress  String
+  userAgent  String
+  outcome    String // 'success' | 'failure'
+  details    String? // JSON string
+  timestamp  DateTime @default(now())
+
+  @@map("audit_logs")
+}
+
+model DataAccessLog {
+  id            String   @id @default(cuid())
+  userId        String
+  accessorId    String
+  accessorRole  String // 'user' | 'therapist' | 'admin' | 'system'
+  resourceType  String
+  resourceId    String
+  action        String // 'create' | 'read' | 'update' | 'delete' | 'export'
+  ipAddress     String
+  userAgent     String
+  purpose       String
+  authorized    Boolean
+  encryptedData String?
+  timestamp     DateTime @default(now())
+
+  @@map("data_access_logs")
+}
+
+model AuditTrail {
+  id        String   @id @default(cuid())
+  userId    String
+  eventType String
+  eventData String // JSON string
+  timestamp DateTime @default(now())
+  actorId   String
+  actorRole String
+  ipAddress String
+  userAgent String
+  checksum  String
+
+  @@map("audit_trails")
+}
+
+// SecurityEvent model for security auditing
+model SecurityEvent {
+  id        String   @id @default(cuid())
+  eventType String
+  severity  String
+  userId    String?
+  ipAddress String
+  userAgent String
+  resource  String?
+  action    String?
+  outcome   String
+  details   String // JSON string
+  timestamp DateTime @default(now())
+  checksum  String
+
+  @@map("security_events")
+}
+
+// VulnerabilityScan model for security scanning
+model VulnerabilityScan {
+  id       String   @id @default(cuid())
+  scanType String
+  target   String
+  findings String // JSON string
+  scanDate DateTime @default(now())
+  status   String
+  duration Int
+
+  @@map("vulnerability_scans")
+}
+
+// GDPR Compliance Models
+model DataSubjectRequest {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  requestType   String
+  status        String    @default("pending")
+  requestedAt   DateTime  @default(now())
+  completedAt   DateTime?
+  justification String?
+  requesterInfo String // JSON string
+  responseData  String? // JSON string
+  processedBy   String?
+
+  @@map("data_subject_requests")
+}
+
+model ConsentRecord {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  consentType String
+  consented   Boolean
+  consentedAt DateTime?
+  withdrawnAt DateTime?
+  version     String
+  ipAddress   String
+  userAgent   String
+  legalBasis  String?
+
+  @@map("consent_records")
+}
+
+model DataProcessingRecord {
+  id                      String    @id @default(cuid())
+  userId                  String
+  user                    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  purpose                 String
+  legalBasis              String
+  dataCategories          String // JSON string
+  recipients              String // JSON string
+  retentionPeriod         Int
+  processingStarted       DateTime  @default(now())
+  processingEnded         DateTime?
+  automatedDecisionMaking Boolean   @default(false)
+  dataTransfers           String // JSON string
+
+  @@map("data_processing_records")
+}
+
 // Enum definitions
-enum UserRole {
-  USER
-  THERAPIST
-  ADMIN
-}
-
-enum PrivacyMode {
-  STANDARD
-  MAX_SECURE
-}
-
-enum MessageRole {
-  USER
-  ASSISTANT
-}
-
-enum CrisisSource {
-  CONVERSATION
-  MOOD_ENTRY
-  MANUAL_REPORT
-}
-
-enum CrisisLevel {
-  LOW
-  MEDIUM
-  HIGH
-  CRITICAL
-}
-
-enum EscalationStatus {
-  PENDING
-  ESCALATED
-  RESOLVED
-  DISMISSED
-}
-
-enum CBTExerciseCategory {
-  THOUGHT_CHALLENGING
-  BEHAVIOR_ACTIVATION
-  RELAXATION
-  MINDFULNESS
-  COGNITIVE_RESTRUCTURING
-  EXPOSURE
-  PROBLEM_SOLVING
-  COMMUNICATION
-}
-
-enum CBTExerciseDifficulty {
-  BEGINNER
-  INTERMEDIATE
-  ADVANCED
-}
-
-enum CBTContentStatus {
-  DRAFT
-  PENDING_REVIEW
-  APPROVED
-  REJECTED
-  PUBLISHED
-}

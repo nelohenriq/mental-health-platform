@@ -1,0 +1,105 @@
+{
+  "project": {
+    "name": "Mental Health Support Platform",
+    "type": "full-stack-web-mobile-hybrid",
+    "target": "consumer-saas",
+    "audience": "individual-users",
+    "scale": "small",
+    "timeline": "3-months-mvp"
+  },
+  "team": {
+    "size": "2-5-people",
+    "experience": "javascript-typescript-strong",
+    "comfort": "react-nextjs-familiar"
+  },
+  "tech": {
+    "frontend": {
+      "framework": "nextjs-15",
+      "language": "typescript-5.3",
+      "ui": "shadcn-ui-radix",
+      "styling": "tailwind-css-3.4",
+      "state": "zustand-tanstack-query",
+      "forms": "react-hook-form-zod"
+    },
+    "backend": {
+      "runtime": "nextjs-api-routes",
+      "api": "trpc-11",
+      "database": {
+        "dev": "sqlite",
+        "prod": "mongodb"
+      },
+      "orm": "prisma-5",
+      "auth": "nextauth-5",
+      "validation": "zod"
+    },
+    "ai": {
+      "providers": ["openai-gpt4", "google-gemini", "groq", "xai-grok"],
+      "sdk": "vercel-ai-sdk",
+      "key-management": "user-configurable"
+    },
+    "mobile": {
+      "framework": "react-native-expo",
+      "navigation": "expo-router"
+    },
+    "infrastructure": {
+      "hosting": "vercel",
+      "database-hosting": "railway-planetscale",
+      "storage": {
+        "dev": "vercel-blob",
+        "prod": "aws-s3"
+      },
+      "monitoring": "vercel-analytics-sentry"
+    },
+    "devtools": {
+      "monorepo": "turborepo",
+      "testing": "vitest-react-testing-library",
+      "linting": "eslint-prettier",
+      "package-manager": "pnpm"
+    }
+  },
+  "requirements": {
+    "performance": {
+      "response-time": "<500ms",
+      "users": "<1000",
+      "data-volume": "<10GB"
+    },
+    "features": {
+      "real-time": "basic-chat",
+      "auth": "basic-jwt",
+      "compliance": "gdpr",
+      "ai-integration": "multi-provider-user-keys"
+    },
+    "budget": {
+      "tier": "free-low-cost",
+      "monthly-limit": "<100",
+      "devops": "basic-skills"
+    }
+  },
+  "dependencies": {
+    "core": {
+      "next": "15.0.0",
+      "react": "19.0.0",
+      "typescript": "5.3.0",
+      "tailwindcss": "3.4.0",
+      "prisma": "5.7.0",
+      "trpc": "11.0.0",
+      "nextauth": "5.0.0"
+    },
+    "ui": {
+      "shadcn-ui": "latest",
+      "radix-ui": "latest",
+      "lucide-react": "0.344.0",
+      "zustand": "4.5.0",
+      "tanstack-query": "5.17.0"
+    },
+    "ai": {
+      "ai": "3.0.0",
+      "openai": "4.28.0",
+      "google-generative-ai": "0.11.0"
+    },
+    "mobile": {
+      "expo": "50.0.0",
+      "react-native": "0.73.0"
+    }
+  }
+}
