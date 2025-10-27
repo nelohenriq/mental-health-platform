@@ -1,0 +1,210 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model
+model User {
+  id        String      @id @default(cuid())
+  email     String      @unique
+  name      String?
+  password  String
+  image     String?
+  role      UserRole    @default(USER)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  // Mental health specific fields
+  crisisFlag         Boolean       @default(false)
+  privacyMode        PrivacyMode   @default(STANDARD)
+  onboardingCompleted Boolean      @default(false)
+
+  // Relations
+  moodEntries      MoodEntry[]
+  conversations    Conversation[]
+  cbtSessions      CBTSession[]
+  crisisEvents     CrisisEvent[] // Added to fix relation
+
+  @@map("users")
+}
+
+// MoodEntry model
+model MoodEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  moodLevel Int      // 1-10 scale
+  notes     String?
+  factors   String?  // Store JSON array of mood factors as string
+  timestamp DateTime @default(now())
+
+  @@map("mood_entries")
+}
+
+// Conversation model
+model Conversation {
+  id              String        @id @default(cuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionContext  String?       // JSON context for AI conversation
+  startAt         DateTime      @default(now())
+  endAt           DateTime?
+  crisisDetected  Boolean       @default(false)
+
+  // Relations
+  messages        Message[]
+
+  @@map("conversations")
+}
+
+// Message model
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           MessageRole
+  content        String
+  timestamp      DateTime     @default(now())
+
+  @@map("messages")
+}
+
+// CBTExercise model
+model CBTExercise {
+  id          String        @id @default(cuid())
+  title       String
+  description String?
+  category    CBTExerciseCategory
+  difficulty  CBTExerciseDifficulty
+  content     String        // JSON content for the exercise structure
+  mediaUrls   String?       // JSON array of media URLs
+  isActive    Boolean       @default(true)
+  status      CBTContentStatus @default(DRAFT)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  createdBy   String        // Admin user ID who created it
+  reviewedBy  String?       // Admin user ID who reviewed it
+  reviewedAt  DateTime?
+  version     Int           @default(1)
+
+  // Relations
+  sessions    CBTSession[]
+  versions    CBTExerciseVersion[]
+
+  @@map("cbt_exercises")
+}
+
+// CBTExerciseVersion model for version history
+model CBTExerciseVersion {
+  id          String   @id @default(cuid())
+  exerciseId  String
+  exercise    CBTExercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  version     Int
+  title       String
+  description String?
+  category    CBTExerciseCategory
+  difficulty  CBTExerciseDifficulty
+  content     String
+  mediaUrls   String?
+  changes     String?  // Description of what changed
+  createdBy   String
+  createdAt   DateTime @default(now())
+
+  @@unique([exerciseId, version])
+  @@map("cbt_exercise_versions")
+}
+
+// CBTSession model
+model CBTSession {
+  id            String     @id @default(cuid())
+  userId        String
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exerciseId    String
+  exercise      CBTExercise @relation(fields: [exerciseId], references: [id])
+  progress      String     // JSON progress data
+  isCompleted   Boolean    @default(false)
+  startedAt     DateTime   @default(now())
+  completedAt   DateTime?
+  score         Int?       // Optional score for exercises
+
+  @@map("cbt_sessions")
+}
+
+// CrisisEvent model
+model CrisisEvent {
+  id                String           @id @default(cuid())
+  userId            String
+  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  source            CrisisSource
+  detectedAt        DateTime         @default(now())
+  flagLevel         CrisisLevel
+  escalationStatus  EscalationStatus @default(PENDING)
+
+  @@map("crisis_events")
+}
+
+// Enum definitions
+enum UserRole {
+  USER
+  THERAPIST
+  ADMIN
+}
+
+enum PrivacyMode {
+  STANDARD
+  MAX_SECURE
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+}
+
+enum CrisisSource {
+  CONVERSATION
+  MOOD_ENTRY
+  MANUAL_REPORT
+}
+
+enum CrisisLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum EscalationStatus {
+  PENDING
+  ESCALATED
+  RESOLVED
+  DISMISSED
+}
+
+enum CBTExerciseCategory {
+  THOUGHT_CHALLENGING
+  BEHAVIOR_ACTIVATION
+  RELAXATION
+  MINDFULNESS
+  COGNITIVE_RESTRUCTURING
+  EXPOSURE
+  PROBLEM_SOLVING
+  COMMUNICATION
+}
+
+enum CBTExerciseDifficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum CBTContentStatus {
+  DRAFT
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+  PUBLISHED
+}
