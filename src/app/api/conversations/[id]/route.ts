@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { getAIProviderManager } from '@/lib/ai/providers';
 import { detectCrisisIndicators } from '@/lib/ai/prompts';
+import { executeCrisisDetectionPipeline } from '@/lib/ai/crisis';
 import { z } from 'zod';
 
 const sendMessageSchema = z.object({
@@ -125,8 +126,50 @@ export async function POST(
       },
     });
 
-    // Check for crisis indicators
-    const crisisDetected = detectCrisisIndicators(message);
+    // Enhanced crisis detection using comprehensive pipeline
+    const userMoodEntries = await prisma.moodEntry.findMany({
+      where: { userId: session.user.id },
+      orderBy: { timestamp: 'desc' },
+      take: 10,
+    });
+
+    const recentMoods = userMoodEntries.map(entry => entry.moodLevel);
+    const currentMood = recentMoods[0];
+
+    const conversationHistory = conversation.messages.map(msg => msg.content);
+
+    const previousCrisisEvents = await (prisma as any).crisisEvent.count({
+      where: {
+        userId: session.user.id,
+        detectedAt: {
+          gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // Last 30 days
+        },
+      },
+    });
+
+    const crisisContext = {
+      userId: session.user.id,
+      currentMood,
+      recentMoods,
+      conversationHistory,
+      previousCrisisEvents,
+      timeOfDay: new Date().toTimeString().split(' ')[0],
+    };
+
+    const crisisHistory = {
+      previousIncidents: [], // Would need to fetch from crisis events
+      patterns: [],
+      riskFactors: [],
+    };
+
+    // Execute comprehensive crisis detection pipeline
+    const crisisAssessment = await executeCrisisDetectionPipeline(
+      message,
+      crisisContext,
+      crisisHistory
+    );
+
+    const crisisDetected = crisisAssessment.overallLevel !== 'NONE';
 
     if (crisisDetected && !conversation.crisisDetected) {
       await prisma.conversation.update({
@@ -134,13 +177,19 @@ export async function POST(
         data: { crisisDetected: true },
       });
 
-      // Create crisis event
+      // Create crisis event with enhanced data
       await (prisma as any).crisisEvent.create({
         data: {
           userId: session.user.id,
           source: 'CONVERSATION',
-          flagLevel: 'HIGH',
-          escalationStatus: 'PENDING',
+          flagLevel: crisisAssessment.overallLevel,
+          escalationStatus: crisisAssessment.requiresImmediateAction ? 'ESCALATED' : 'PENDING',
+          notes: JSON.stringify({
+            assessment: crisisAssessment,
+            message: message,
+            confidence: crisisAssessment.confidence,
+            riskFactors: crisisAssessment.escalationPath,
+          }),
         },
       });
     }

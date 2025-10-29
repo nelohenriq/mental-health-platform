@@ -1,0 +1,94 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - img [ref=e7]
+          - heading "MindWell" [level=1] [ref=e9]
+        - navigation [ref=e10]:
+          - link "Mood Tracking" [ref=e11] [cursor=pointer]:
+            - /url: /mood
+          - link "CBT Exercises" [ref=e12] [cursor=pointer]:
+            - /url: /cbt
+          - link "AI Chat" [active] [ref=e13] [cursor=pointer]:
+            - /url: /conversations
+          - link "Profile" [ref=e14] [cursor=pointer]:
+            - /url: /profile
+        - generic [ref=e15]:
+          - link "Sign In" [ref=e16] [cursor=pointer]:
+            - /url: /auth/login
+            - button "Sign In" [ref=e17]
+          - link "Get Started" [ref=e18] [cursor=pointer]:
+            - /url: /auth/register
+            - button "Get Started" [ref=e19]
+    - generic [ref=e21]:
+      - heading "Your Mental Health Journey Starts Here" [level=1] [ref=e22]
+      - paragraph [ref=e23]: Track your mood, practice CBT exercises, and engage in therapeutic conversations with AI support. Take control of your mental wellness with compassionate technology.
+      - generic [ref=e24]:
+        - link "Start Your Journey" [ref=e25] [cursor=pointer]:
+          - /url: /auth/register
+          - button "Start Your Journey" [ref=e26]
+        - link "Learn More" [ref=e27] [cursor=pointer]:
+          - /url: /dashboard
+          - button "Learn More" [ref=e28]
+    - generic [ref=e30]:
+      - heading "Comprehensive Mental Health Support" [level=2] [ref=e31]
+      - generic [ref=e32]:
+        - generic [ref=e33]:
+          - generic [ref=e34]:
+            - img [ref=e35]
+            - heading "Mood Tracking" [level=3] [ref=e38]
+          - paragraph [ref=e40]: Monitor your emotional patterns with easy-to-use mood logging and trend analysis.
+        - generic [ref=e41]:
+          - generic [ref=e42]:
+            - img [ref=e43]
+            - heading "CBT Exercises" [level=3] [ref=e53]
+          - paragraph [ref=e55]: Practice evidence-based Cognitive Behavioral Therapy exercises tailored to your needs.
+        - generic [ref=e56]:
+          - generic [ref=e57]:
+            - img [ref=e58]
+            - heading "AI Conversations" [level=3] [ref=e63]
+          - paragraph [ref=e65]: Engage in supportive conversations with our AI therapist for guidance and reflection.
+        - generic [ref=e66]:
+          - generic [ref=e67]:
+            - img [ref=e68]
+            - heading "Personalized Care" [level=3] [ref=e70]
+          - paragraph [ref=e72]: Receive personalized recommendations and progress tracking for your mental wellness journey.
+    - generic [ref=e74]:
+      - heading "Ready to Prioritize Your Mental Health?" [level=2] [ref=e75]
+      - paragraph [ref=e76]: Join thousands of users who have taken the first step towards better mental wellness.
+      - link "Begin Your Journey Today" [ref=e77] [cursor=pointer]:
+        - /url: /auth/register
+        - button "Begin Your Journey Today" [ref=e78]
+    - contentinfo [ref=e79]:
+      - generic [ref=e80]:
+        - generic [ref=e81]:
+          - generic [ref=e82]:
+            - img [ref=e83]
+            - generic [ref=e85]: MindWell
+          - generic [ref=e86]:
+            - link "Privacy" [ref=e87] [cursor=pointer]:
+              - /url: /privacy
+            - link "Terms" [ref=e88] [cursor=pointer]:
+              - /url: /terms
+            - link "Support" [ref=e89] [cursor=pointer]:
+              - /url: /support
+        - paragraph [ref=e91]: © 2024 MindWell. Your mental health matters.
+  - generic:
+    - generic [ref=e94] [cursor=pointer]:
+      - img [ref=e95]
+      - generic [ref=e97]: 1 error
+      - button "Hide Errors" [ref=e98]:
+        - img [ref=e99]
+    - status [ref=e102]:
+      - generic [ref=e103]:
+        - img [ref=e105]
+        - generic [ref=e107]:
+          - text: Static route
+          - button "Hide static indicator" [ref=e108] [cursor=pointer]:
+            - img [ref=e109]
+  - alert [ref=e112]
+```

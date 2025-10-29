@@ -1,12 +1,13 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   TrendingUp,
   Target,
@@ -18,8 +19,8 @@ import {
   Plus,
   Play,
   CheckCircle,
-  Clock
-} from 'lucide-react';
+  Clock,
+} from "lucide-react";
 
 interface DashboardStats {
   moodToday: number | null;
@@ -37,7 +38,7 @@ interface DashboardStats {
 
 interface RecentActivity {
   id: string;
-  type: 'mood' | 'cbt' | 'achievement';
+  type: "mood" | "cbt" | "achievement";
   title: string;
   description: string;
   timestamp: string;
@@ -55,14 +56,41 @@ interface RecommendedExercise {
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
-  const [recommendations, setRecommendations] = useState<RecommendedExercise[]>([]);
+  const [recommendations, setRecommendations] = useState<RecommendedExercise[]>(
+    []
+  );
   const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
-    fetchDashboardData();
+    checkAuth();
   }, []);
+
+  const checkAuth = async () => {
+    try {
+      const response = await fetch("/api/auth/session");
+      if (response.ok) {
+        const session = await response.json();
+        setIsAuthenticated(!!session?.user);
+      } else {
+        setIsAuthenticated(false);
+      }
+    } catch (error) {
+      setIsAuthenticated(false);
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated && !authLoading) {
+      fetchDashboardData();
+    }
+  }, [isAuthenticated, authLoading]);
 
   const fetchDashboardData = async () => {
     try {
@@ -74,66 +102,81 @@ export default function DashboardPage() {
         cbtCompletionRate: 75,
         totalExercisesCompleted: 12,
         currentGoals: [
-          { id: '1', title: 'Complete 5 CBT exercises this week', progress: 3, target: 5 },
-          { id: '2', title: 'Log mood daily for 7 days', progress: 5, target: 7 },
-          { id: '3', title: 'Try mindfulness exercises', progress: 2, target: 3 },
+          {
+            id: "1",
+            title: "Complete 5 CBT exercises this week",
+            progress: 3,
+            target: 5,
+          },
+          {
+            id: "2",
+            title: "Log mood daily for 7 days",
+            progress: 5,
+            target: 7,
+          },
+          {
+            id: "3",
+            title: "Try mindfulness exercises",
+            progress: 2,
+            target: 3,
+          },
         ],
       });
 
       setRecentActivity([
         {
-          id: '1',
-          type: 'mood',
-          title: 'Mood Logged',
-          description: 'You rated your mood as 7/10',
+          id: "1",
+          type: "mood",
+          title: "Mood Logged",
+          description: "You rated your mood as 7/10",
           timestamp: new Date().toISOString(),
           value: 7,
         },
         {
-          id: '2',
-          type: 'cbt',
-          title: 'Exercise Completed',
-          description: 'Thought Challenging: Cognitive Restructuring',
+          id: "2",
+          type: "cbt",
+          title: "Exercise Completed",
+          description: "Thought Challenging: Cognitive Restructuring",
           timestamp: new Date(Date.now() - 3600000).toISOString(),
           completed: true,
         },
         {
-          id: '3',
-          type: 'achievement',
-          title: 'Streak Achievement',
-          description: '5-day mood logging streak!',
+          id: "3",
+          type: "achievement",
+          title: "Streak Achievement",
+          description: "5-day mood logging streak!",
           timestamp: new Date(Date.now() - 7200000).toISOString(),
         },
       ]);
 
       setRecommendations([
         {
-          id: '1',
-          title: 'Deep Breathing Exercise',
-          category: 'RELAXATION',
-          difficulty: 'BEGINNER',
+          id: "1",
+          title: "Deep Breathing Exercise",
+          category: "RELAXATION",
+          difficulty: "BEGINNER",
           estimatedTime: 5,
-          description: 'Learn breathing techniques to reduce anxiety',
+          description: "Learn breathing techniques to reduce anxiety",
         },
         {
-          id: '2',
-          title: 'Thought Records',
-          category: 'COGNITIVE_RESTRUCTURING',
-          difficulty: 'INTERMEDIATE',
+          id: "2",
+          title: "Thought Records",
+          category: "COGNITIVE_RESTRUCTURING",
+          difficulty: "INTERMEDIATE",
           estimatedTime: 15,
-          description: 'Challenge negative thought patterns',
+          description: "Challenge negative thought patterns",
         },
         {
-          id: '3',
-          title: 'Activity Scheduling',
-          category: 'BEHAVIOR_ACTIVATION',
-          difficulty: 'BEGINNER',
+          id: "3",
+          title: "Activity Scheduling",
+          category: "BEHAVIOR_ACTIVATION",
+          difficulty: "BEGINNER",
           estimatedTime: 10,
-          description: 'Plan enjoyable activities to improve mood',
+          description: "Plan enjoyable activities to improve mood",
         },
       ]);
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+      console.error("Error fetching dashboard data:", error);
     } finally {
       setLoading(false);
     }
@@ -141,26 +184,63 @@ export default function DashboardPage() {
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'BEGINNER': return 'bg-green-100 text-green-800';
-      case 'INTERMEDIATE': return 'bg-yellow-100 text-yellow-800';
-      case 'ADVANCED': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "BEGINNER":
+        return "bg-green-100 text-green-800";
+      case "INTERMEDIATE":
+        return "bg-yellow-100 text-yellow-800";
+      case "ADVANCED":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getCategoryColor = (category: string) => {
     const colors: Record<string, string> = {
-      'THOUGHT_CHALLENGING': 'bg-blue-100 text-blue-800',
-      'BEHAVIOR_ACTIVATION': 'bg-purple-100 text-purple-800',
-      'RELAXATION': 'bg-pink-100 text-pink-800',
-      'MINDFULNESS': 'bg-indigo-100 text-indigo-800',
-      'COGNITIVE_RESTRUCTURING': 'bg-orange-100 text-orange-800',
-      'EXPOSURE': 'bg-red-100 text-red-800',
-      'PROBLEM_SOLVING': 'bg-teal-100 text-teal-800',
-      'COMMUNICATION': 'bg-cyan-100 text-cyan-800',
+      THOUGHT_CHALLENGING: "bg-blue-100 text-blue-800",
+      BEHAVIOR_ACTIVATION: "bg-purple-100 text-purple-800",
+      RELAXATION: "bg-pink-100 text-pink-800",
+      MINDFULNESS: "bg-indigo-100 text-indigo-800",
+      COGNITIVE_RESTRUCTURING: "bg-orange-100 text-orange-800",
+      EXPOSURE: "bg-red-100 text-red-800",
+      PROBLEM_SOLVING: "bg-teal-100 text-teal-800",
+      COMMUNICATION: "bg-cyan-100 text-cyan-800",
     };
-    return colors[category] || 'bg-gray-100 text-gray-800';
+    return colors[category] || "bg-gray-100 text-gray-800";
   };
+
+  if (authLoading) {
+    return (
+      <div className="container mx-auto py-8">
+        <div className="text-center">Loading dashboard...</div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="container mx-auto py-8">
+        <div className="text-center py-16">
+          <Heart className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+          <h2 className="text-2xl font-bold mb-4">
+            Welcome to Mental Health Support
+          </h2>
+          <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+            Sign in to access your personalized dashboard and mental health
+            tools.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/auth/login">
+              <Button>Sign In</Button>
+            </Link>
+            <Link href="/auth/register">
+              <Button variant="outline">Create Account</Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -174,7 +254,9 @@ export default function DashboardPage() {
     <div className="container mx-auto py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Welcome back! 👋</h1>
-        <p className="text-muted-foreground">Here's your mental health progress overview</p>
+        <p className="text-muted-foreground">
+          Here's your mental health progress overview
+        </p>
       </div>
 
       {/* Quick Stats */}
@@ -189,7 +271,7 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {stats.moodToday ? `${stats.moodToday}/10` : 'Not logged'}
+                {stats.moodToday ? `${stats.moodToday}/10` : "Not logged"}
               </div>
               <p className="text-xs text-muted-foreground">
                 {stats.moodStreak} day streak
@@ -205,7 +287,9 @@ export default function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.cbtSessionsThisWeek}</div>
+              <div className="text-2xl font-bold">
+                {stats.cbtSessionsThisWeek}
+              </div>
               <p className="text-xs text-muted-foreground">CBT sessions</p>
             </CardContent>
           </Card>
@@ -218,7 +302,9 @@ export default function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.cbtCompletionRate}%</div>
+              <div className="text-2xl font-bold">
+                {stats.cbtCompletionRate}%
+              </div>
               <Progress value={stats.cbtCompletionRate} className="mt-2" />
             </CardContent>
           </Card>
@@ -231,7 +317,9 @@ export default function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalExercisesCompleted}</div>
+              <div className="text-2xl font-bold">
+                {stats.totalExercisesCompleted}
+              </div>
               <p className="text-xs text-muted-foreground">Exercises done</p>
             </CardContent>
           </Card>
@@ -281,15 +369,22 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               {recommendations.slice(0, 3).map((exercise) => (
-                <div key={exercise.id} className="flex items-center justify-between p-4 border rounded-lg">
+                <div
+                  key={exercise.id}
+                  className="flex items-center justify-between p-4 border rounded-lg"
+                >
                   <div className="flex-1">
                     <h3 className="font-medium">{exercise.title}</h3>
-                    <p className="text-sm text-muted-foreground mb-2">{exercise.description}</p>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      {exercise.description}
+                    </p>
                     <div className="flex space-x-2">
                       <Badge className={getCategoryColor(exercise.category)}>
-                        {exercise.category.replace('_', ' ')}
+                        {exercise.category.replace("_", " ")}
                       </Badge>
-                      <Badge className={getDifficultyColor(exercise.difficulty)}>
+                      <Badge
+                        className={getDifficultyColor(exercise.difficulty)}
+                      >
                         {exercise.difficulty}
                       </Badge>
                       <span className="text-xs text-muted-foreground flex items-center">
@@ -347,24 +442,30 @@ export default function DashboardPage() {
             <CardContent className="space-y-4">
               {recentActivity.map((activity) => (
                 <div key={activity.id} className="flex items-start space-x-3">
-                  <div className={`w-2 h-2 rounded-full mt-2 ${
-                    activity.type === 'mood' ? 'bg-blue-500' :
-                    activity.type === 'cbt' ? 'bg-green-500' :
-                    'bg-purple-500'
-                  }`} />
+                  <div
+                    className={`w-2 h-2 rounded-full mt-2 ${
+                      activity.type === "mood"
+                        ? "bg-blue-500"
+                        : activity.type === "cbt"
+                          ? "bg-green-500"
+                          : "bg-purple-500"
+                    }`}
+                  />
                   <div className="flex-1">
                     <p className="font-medium text-sm">{activity.title}</p>
-                    <p className="text-xs text-muted-foreground">{activity.description}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {activity.description}
+                    </p>
                     <p className="text-xs text-muted-foreground">
                       {new Date(activity.timestamp).toLocaleDateString()}
                     </p>
                   </div>
-                  {activity.type === 'mood' && activity.value && (
+                  {activity.type === "mood" && activity.value && (
                     <Badge variant="outline" className="text-xs">
                       {activity.value}/10
                     </Badge>
                   )}
-                  {activity.type === 'cbt' && activity.completed && (
+                  {activity.type === "cbt" && activity.completed && (
                     <CheckCircle className="h-4 w-4 text-green-500" />
                   )}
                 </div>

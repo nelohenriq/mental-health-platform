@@ -8,6 +8,14 @@ export interface SegmentCriteria {
   registrationDate?: { before?: Date; after?: Date };
   lastActivity?: { daysAgo: number };
   featureUsage?: { feature: string; count: number; operator: 'gt' | 'lt' | 'eq' };
+  // Additional criteria for testing
+  cbtCompletionRate?: { min?: number; max?: number; weight?: number };
+  moodEntriesPerWeek?: { min?: number; max?: number; weight?: number };
+  sessionDuration?: { min?: number; max?: number; weight?: number };
+  moodTrend?: string;
+  cbtPreferences?: string[];
+  engagementScore?: { min?: number; max?: number; weight?: number };
+  lastActive?: { within?: string };
 }
 
 export interface CohortAnalysis {
@@ -23,6 +31,207 @@ export interface CohortAnalysis {
     genderDistribution: Record<string, number>;
     locationDistribution: Record<string, number>;
   };
+}
+
+export interface Segment {
+  id: string;
+  name: string;
+  description: string;
+  criteria: SegmentCriteria;
+  targetSize: number;
+  isActive: boolean;
+  createdAt: Date;
+}
+
+export interface UserData {
+  userId: string;
+  cbtCompletionRate?: number;
+  moodEntriesPerWeek?: number;
+  sessionDuration?: number;
+  moodTrend?: string;
+  cbtPreferences?: string[];
+  engagementScore?: number;
+  lastActive?: Date;
+}
+
+export interface EvaluationResult {
+  matches: boolean;
+  score: number;
+  matchedCriteria: string[];
+}
+
+export interface SegmentAnalytics {
+  segmentId: string;
+  totalMembers: number;
+  averageScore: number;
+  sizeVsTarget: number;
+  retentionRate?: number;
+  churnRate?: number;
+  healthIssues: string[];
+  recommendations: string[];
+  createdAt: Date;
+}
+
+/**
+ * Create a new segment with validation
+ */
+export function createSegment(data: {
+  name: string;
+  description: string;
+  criteria: SegmentCriteria;
+  targetSize: number;
+  isActive: boolean;
+}): Segment {
+  if (!data.name || !data.description) {
+    throw new Error('Segment name and description are required');
+  }
+
+  if (!data.criteria || Object.keys(data.criteria).length === 0) {
+    throw new Error('Invalid segment criteria');
+  }
+
+  return {
+    id: `segment-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    name: data.name,
+    description: data.description,
+    criteria: data.criteria,
+    targetSize: data.targetSize,
+    isActive: data.isActive,
+    createdAt: new Date(),
+  };
+}
+
+/**
+ * Evaluate if a user matches segment criteria
+ */
+export function evaluateUserSegment(userData: UserData, segment: Segment): EvaluationResult {
+  const matchedCriteria: string[] = [];
+  let totalScore = 0;
+  let totalWeight = 0;
+
+  // Evaluate each criterion
+  Object.entries(segment.criteria).forEach(([key, value]) => {
+    if (value === undefined || value === null) return;
+
+    const userValue = (userData as any)[key];
+    if (userValue === undefined) return;
+
+    let matches = false;
+    let weight = 1;
+
+    switch (key) {
+      case 'cbtCompletionRate':
+      case 'moodEntriesPerWeek':
+      case 'sessionDuration':
+      case 'engagementScore':
+        const range = value as { min?: number; max?: number; weight?: number };
+        weight = range.weight || 1;
+        if (range.min !== undefined && userValue >= range.min) matches = true;
+        if (range.max !== undefined && userValue <= range.max) matches = matches && true;
+        else if (range.max === undefined) matches = true;
+        break;
+
+      case 'moodTrend':
+        matches = userValue === value;
+        break;
+
+      case 'cbtPreferences':
+        const preferences = value as string[];
+        matches = preferences.some(pref => (userValue as string[]).includes(pref));
+        break;
+
+      case 'lastActive':
+        const within = value as { within?: string };
+        if (within.within) {
+          const days = parseInt(within.within.replace('d', ''));
+          const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+          matches = userValue > cutoff;
+        }
+        break;
+
+      default:
+        matches = true; // For unsupported criteria, assume match
+    }
+
+    if (matches) {
+      matchedCriteria.push(key);
+      totalScore += weight;
+    }
+    totalWeight += weight;
+  });
+
+  const score = totalWeight > 0 ? totalScore / totalWeight : 0;
+
+  return {
+    matches: matchedCriteria.length > 0,
+    score,
+    matchedCriteria,
+  };
+}
+
+/**
+ * Generate analytics for a segment
+ */
+export function getSegmentAnalytics(segment: Segment, members: Array<{ userId: string; score: number; retained?: boolean }>): SegmentAnalytics {
+  const totalMembers = members.length;
+  const averageScore = totalMembers > 0 ? members.reduce((sum, m) => sum + m.score, 0) / totalMembers : 0;
+  const sizeVsTarget = totalMembers / segment.targetSize;
+
+  let retentionRate: number | undefined;
+  let churnRate: number | undefined;
+
+  if (members.some(m => m.retained !== undefined)) {
+    const retainedCount = members.filter(m => m.retained).length;
+    retentionRate = totalMembers > 0 ? retainedCount / totalMembers : 0;
+    churnRate = 1 - retentionRate;
+  }
+
+  const healthIssues: string[] = [];
+  const recommendations: string[] = [];
+
+  if (totalMembers < segment.targetSize * 0.1) {
+    healthIssues.push('low_population');
+    recommendations.push('Consider broadening criteria');
+  }
+
+  if (averageScore < 0.5) {
+    healthIssues.push('low_engagement');
+    recommendations.push('Review segment criteria for better targeting');
+  }
+
+  return {
+    segmentId: segment.id,
+    totalMembers,
+    averageScore,
+    sizeVsTarget,
+    retentionRate,
+    churnRate,
+    healthIssues,
+    recommendations,
+    createdAt: new Date(),
+  };
+}
+
+/**
+ * Segment users by activity level
+ */
+export function segmentUsersByActivity(activityData: Array<{ userId: string; activityCount: number }>): Array<{ userId: string; segment: string }> {
+  return activityData.map(user => ({
+    userId: user.userId,
+    segment: user.activityCount > 50 ? 'HIGH' : user.activityCount > 20 ? 'MEDIUM' : 'LOW'
+  }));
+}
+
+/**
+ * Segment users by mood patterns
+ */
+export function segmentUsersByMood(moodData: Array<{ userId: string; averageMood: number; moodVariance: number }>): Array<{ userId: string; segment: string }> {
+  return moodData.map(user => {
+    if (user.averageMood >= 7) return { userId: user.userId, segment: 'HIGH_MOOD' };
+    if (user.averageMood <= 3) return { userId: user.userId, segment: 'LOW_MOOD' };
+    if (user.moodVariance > 2) return { userId: user.userId, segment: 'MOOD_SWINGS' };
+    return { userId: user.userId, segment: 'STABLE_MOOD' };
+  });
 }
 
 export class SegmentationService {

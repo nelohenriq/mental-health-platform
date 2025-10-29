@@ -112,3 +112,130 @@ export async function POST(request: NextRequest) {
     )
   }
 }
+
+export async function PUT(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions)
+
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      )
+    }
+
+    const { id, moodLevel, notes, factors } = await request.json()
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "Entry ID is required" },
+        { status: 400 }
+      )
+    }
+
+    // Check if entry exists and belongs to user
+    const existingEntry = await prisma.moodEntry.findFirst({
+      where: {
+        id,
+        userId: session.user.id
+      }
+    })
+
+    if (!existingEntry) {
+      return NextResponse.json(
+        { error: "Mood entry not found" },
+        { status: 404 }
+      )
+    }
+
+    // Validate mood level if provided
+    if (moodLevel !== undefined && (moodLevel < 1 || moodLevel > 10)) {
+      return NextResponse.json(
+        { error: "Mood level must be between 1 and 10" },
+        { status: 400 }
+      )
+    }
+
+    // Validate factors array if provided
+    if (factors !== undefined && !Array.isArray(factors)) {
+      return NextResponse.json(
+        { error: "Factors must be an array of strings" },
+        { status: 400 }
+      )
+    }
+
+    const updatedEntry = await prisma.moodEntry.update({
+      where: { id },
+      data: {
+        ...(moodLevel !== undefined && { moodLevel: parseInt(moodLevel) }),
+        ...(notes !== undefined && { notes: notes || null }),
+        ...(factors !== undefined && { factors: factors || [] }),
+      }
+    })
+
+    return NextResponse.json({
+      message: "Mood entry updated successfully",
+      entry: updatedEntry
+    })
+
+  } catch (error) {
+    console.error("Update mood entry error:", error)
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    )
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions)
+
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      )
+    }
+
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "Entry ID is required" },
+        { status: 400 }
+      )
+    }
+
+    // Check if entry exists and belongs to user
+    const existingEntry = await prisma.moodEntry.findFirst({
+      where: {
+        id,
+        userId: session.user.id
+      }
+    })
+
+    if (!existingEntry) {
+      return NextResponse.json(
+        { error: "Mood entry not found" },
+        { status: 404 }
+      )
+    }
+
+    await prisma.moodEntry.delete({
+      where: { id }
+    })
+
+    return NextResponse.json({
+      message: "Mood entry deleted successfully"
+    })
+
+  } catch (error) {
+    console.error("Delete mood entry error:", error)
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    )
+  }
+}

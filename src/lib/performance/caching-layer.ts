@@ -1,4 +1,4 @@
-import { Redis } from '@/lib/redis';
+import redis from 'redis';
 
 export interface CacheConfig {
   ttl: number; // Time to live in seconds
@@ -14,12 +14,12 @@ export interface CacheEntry<T = any> {
 }
 
 export class CachingLayer {
-  private redis: Redis;
+  private redis: redis.RedisClientType;
   private localCache = new Map<string, CacheEntry>();
   private readonly MAX_LOCAL_CACHE_SIZE = 10000;
 
   constructor() {
-    this.redis = new Redis();
+    this.redis = redis.createClient();
   }
 
   /**
@@ -78,7 +78,7 @@ export class CachingLayer {
 
     // Set in Redis
     try {
-      await this.redis.setex(key, config.ttl, JSON.stringify(entry));
+      await this.redis.setEx(key, config.ttl, JSON.stringify(entry));
     } catch (error) {
       console.warn('Redis cache set error:', error);
     }
@@ -153,19 +153,19 @@ export class CachingLayer {
       {
         key: 'stats:user_count',
         data: await this.getUserCount(),
-        config: { ttl: 3600, strategy: 'TTL' }, // 1 hour
+        config: { ttl: 3600, strategy: 'TTL' as const }, // 1 hour
       },
       // Active users today
       {
         key: 'stats:active_users_today',
         data: await this.getActiveUsersToday(),
-        config: { ttl: 1800, strategy: 'TTL' }, // 30 minutes
+        config: { ttl: 1800, strategy: 'TTL' as const }, // 30 minutes
       },
       // Popular CBT exercises
       {
         key: 'cbt:popular_exercises',
         data: await this.getPopularExercises(),
-        config: { ttl: 7200, strategy: 'TTL' }, // 2 hours
+        config: { ttl: 7200, strategy: 'TTL' as const }, // 2 hours
       },
     ];
 
@@ -209,17 +209,17 @@ export class CachingLayer {
       {
         key: `user:${userId}:profile`,
         data: await this.getUserProfile(userId),
-        config: { ttl: 3600, strategy: 'TTL' },
+        config: { ttl: 3600, strategy: 'TTL' as const },
       },
       {
         key: `user:${userId}:recent_moods`,
         data: await this.getRecentMoods(userId),
-        config: { ttl: 1800, strategy: 'TTL' },
+        config: { ttl: 1800, strategy: 'TTL' as const },
       },
       {
         key: `user:${userId}:active_exercises`,
         data: await this.getActiveExercises(userId),
-        config: { ttl: 7200, strategy: 'TTL' },
+        config: { ttl: 7200, strategy: 'TTL' as const },
       },
     ];
 

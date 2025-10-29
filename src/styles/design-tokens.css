@@ -1,0 +1,231 @@
+/* Design Tokens - Mental Health Platform UI/UX Refactor */
+/* WCAG 2.1 AA Compliant Color Palette & Design System */
+
+:root {
+  /* Color System - Primary */
+  --color-primary-50: #eff6ff;   /* Blue-50 - Background accents */
+  --color-primary-100: #dbeafe;  /* Blue-100 - Light backgrounds */
+  --color-primary-200: #bfdbfe;  /* Blue-200 - Subtle borders */
+  --color-primary-300: #93c5fd;  /* Blue-300 - Hover states */
+  --color-primary-400: #60a5fa;  /* Blue-400 - Active states */
+  --color-primary-500: #3b82f6;  /* Blue-500 - Primary actions */
+  --color-primary-600: #2563eb;  /* Blue-600 - Primary hover/focus */
+  --color-primary-700: #1d4ed8;  /* Blue-700 - Active states */
+  --color-primary-800: #1e40af;  /* Blue-800 - Dark variants */
+  --color-primary-900: #1e3a8a;  /* Blue-900 - Darkest variants */
+
+  /* Status Colors - Semantic */
+  --color-success-50: #ecfdf5;   /* Green-50 */
+  --color-success-100: #d1fae5;  /* Green-100 */
+  --color-success-500: #10b981;  /* Green-500 */
+  --color-success-600: #059669;  /* Green-600 */
+
+  --color-error-50: #fef2f2;     /* Red-50 */
+  --color-error-100: #fee2e2;    /* Red-100 */
+  --color-error-500: #ef4444;    /* Red-500 */
+  --color-error-600: #dc2626;    /* Red-600 */
+
+  --color-warning-50: #fffbeb;   /* Amber-50 */
+  --color-warning-100: #fef3c7;  /* Amber-100 */
+  --color-warning-500: #f59e0b;  /* Amber-500 */
+  --color-warning-600: #d97706;  /* Amber-600 */
+
+  --color-info-50: #eff6ff;     /* Blue-50 */
+  --color-info-100: #dbeafe;    /* Blue-100 */
+  --color-info-500: #3b82f6;    /* Blue-500 */
+  --color-info-600: #2563eb;    /* Blue-600 */
+
+  /* Neutral Colors - Grayscale */
+  --color-gray-50: #f9fafb;      /* Background */
+  --color-gray-100: #f3f4f6;     /* Card backgrounds */
+  --color-gray-200: #e5e7eb;     /* Borders */
+  --color-gray-300: #d1d5db;     /* Subtle borders */
+  --color-gray-400: #9ca3af;     /* Placeholder text */
+  --color-gray-500: #6b7280;     /* Secondary text */
+  --color-gray-600: #4b5563;     /* Primary text */
+  --color-gray-700: #374151;     /* Headings */
+  --color-gray-800: #1f2937;     /* Dark headings */
+  --color-gray-900: #111827;     /* Darkest text */
+
+  /* Typography Scale - Fluid & Accessible */
+  --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont,
+                      'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono',
+                      Monaco, 'Cascadia Code', monospace;
+
+  /* Font Sizes - Mobile-first fluid scaling */
+  --text-xs: clamp(0.75rem, 0.7rem + 0.2vw, 0.875rem);    /* 12px → 14px */
+  --text-sm: clamp(0.875rem, 0.8rem + 0.3vw, 1rem);       /* 14px → 16px */
+  --text-base: clamp(1rem, 0.9rem + 0.4vw, 1.125rem);      /* 16px → 18px */
+  --text-lg: clamp(1.125rem, 1rem + 0.5vw, 1.25rem);       /* 18px → 20px */
+  --text-xl: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);       /* 20px → 24px */
+  --text-2xl: clamp(1.5rem, 1.3rem + 0.8vw, 2rem);         /* 24px → 32px */
+  --text-3xl: clamp(1.875rem, 1.6rem + 1vw, 2.5rem);       /* 30px → 40px */
+  --text-4xl: clamp(2.25rem, 1.9rem + 1.2vw, 3rem);        /* 36px → 48px */
+  --text-5xl: clamp(3rem, 2.4rem + 1.5vw, 4rem);           /* 48px → 64px */
+
+  /* Font Weights */
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  --font-weight-black: 900;
+
+  /* Line Heights */
+  --leading-none: 1;
+  --leading-tight: 1.25;
+  --leading-snug: 1.375;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+  --leading-loose: 2;
+
+  /* Spacing System - 4px Base Scale */
+  --space-px: 1px;
+  --space-0: 0;
+  --space-1: 0.25rem;    /* 4px */
+  --space-2: 0.5rem;     /* 8px */
+  --space-3: 0.75rem;    /* 12px */
+  --space-4: 1rem;       /* 16px */
+  --space-5: 1.25rem;    /* 20px */
+  --space-6: 1.5rem;     /* 24px */
+  --space-8: 2rem;       /* 32px */
+  --space-10: 2.5rem;    /* 40px */
+  --space-12: 3rem;      /* 48px */
+  --space-16: 4rem;      /* 64px */
+  --space-20: 5rem;      /* 80px */
+  --space-24: 6rem;      /* 96px */
+  --space-32: 8rem;      /* 128px */
+  --space-40: 10rem;     /* 160px */
+  --space-48: 12rem;     /* 192px */
+  --space-56: 14rem;     /* 224px */
+  --space-64: 16rem;     /* 256px */
+
+  /* Breakpoints - Mobile-first */
+  --breakpoint-sm: 640px;   /* Large phones/small tablets */
+  --breakpoint-md: 768px;   /* Tablets */
+  --breakpoint-lg: 1024px;  /* Small laptops */
+  --breakpoint-xl: 1280px;  /* Laptops/desktops */
+  --breakpoint-2xl: 1536px; /* Large screens */
+
+  /* Container Max-Widths */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+  --container-2xl: 1536px;
+
+  /* Border Radius */
+  --radius-none: 0;
+  --radius-sm: 0.125rem;   /* 2px */
+  --radius-base: 0.25rem;  /* 4px */
+  --radius-md: 0.375rem;   /* 6px */
+  --radius-lg: 0.5rem;     /* 8px */
+  --radius-xl: 0.75rem;    /* 12px */
+  --radius-2xl: 1rem;      /* 16px */
+  --radius-3xl: 1.5rem;    /* 24px */
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-base: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.1);
+
+  /* Component Tokens - Buttons */
+  --button-height-sm: 2rem;      /* 32px */
+  --button-height-base: 2.5rem;  /* 40px - touch friendly */
+  --button-height-lg: 3rem;      /* 48px */
+
+  --button-padding-x-sm: 0.75rem;   /* 12px */
+  --button-padding-x-base: 1rem;    /* 16px */
+  --button-padding-x-lg: 1.5rem;    /* 24px */
+
+  --button-border-radius: 0.375rem; /* 6px */
+  --button-font-weight: 500;
+  --button-transition: all 150ms ease-in-out;
+
+  /* Component Tokens - Inputs */
+  --input-height: 2.5rem;         /* 40px - touch friendly */
+  --input-padding-x: 0.75rem;     /* 12px */
+  --input-border-radius: 0.375rem; /* 6px */
+  --input-border-width: 1px;
+  --input-focus-ring-width: 2px;
+  --input-focus-ring-offset: 2px;
+
+  /* Component Tokens - Cards */
+  --card-padding: 1.5rem;         /* 24px */
+  --card-border-radius: 0.5rem;   /* 8px */
+  --card-border-width: 1px;
+  --card-shadow: var(--shadow-sm);
+
+  /* Focus States */
+  --focus-ring-color: var(--color-primary-500);
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+  --focus-ring-style: solid;
+
+  /* Animation & Transitions */
+  --duration-75: 75ms;
+  --duration-100: 100ms;
+  --duration-150: 150ms;
+  --duration-200: 200ms;
+  --duration-300: 300ms;
+  --duration-500: 500ms;
+  --duration-700: 700ms;
+  --duration-1000: 1000ms;
+
+  --ease-linear: linear;
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  :root {
+    --color-gray-100: #ffffff;
+    --color-gray-200: #ffffff;
+    --focus-ring-width: 3px;
+    --focus-ring-color: #000000;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-75: 0.01ms;
+    --duration-100: 0.01ms;
+    --duration-150: 0.01ms;
+    --duration-200: 0.01ms;
+    --duration-300: 0.01ms;
+    --duration-500: 0.01ms;
+    --duration-700: 0.01ms;
+    --duration-1000: 0.01ms;
+  }
+}
+
+/* Dark Mode Support (Future Enhancement) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Dark mode overrides would go here */
+    /* Currently maintaining light mode for accessibility */
+  }
+}
+
+/* Print Styles */
+@media print {
+  :root {
+    --color-primary-500: #000000;
+    --color-gray-700: #000000;
+    --shadow-sm: none;
+    --shadow-base: none;
+    --shadow-md: none;
+    --shadow-lg: none;
+    --shadow-xl: none;
+    --shadow-2xl: none;
+  }
+}

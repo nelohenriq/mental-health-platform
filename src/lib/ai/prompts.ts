@@ -219,7 +219,8 @@ export const crisisKeywords = [
   'overdose', 'pills', 'poison', 'weapon',
 ];
 
-export function detectCrisisIndicators(text: string): boolean {
+export function detectCrisisIndicators(text: string | null | undefined): boolean {
+  if (!text) return false;
   const lowerText = text.toLowerCase();
   return crisisKeywords.some(keyword => lowerText.includes(keyword));
 }

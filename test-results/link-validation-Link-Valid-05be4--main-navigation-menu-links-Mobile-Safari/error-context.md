@@ -1,0 +1,85 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - img [ref=e7]
+          - heading "MindWell" [level=1] [ref=e9]
+        - generic [ref=e10]:
+          - link "Sign In" [ref=e11]:
+            - /url: /auth/login
+            - button "Sign In" [ref=e12] [cursor=pointer]
+          - link "Get Started" [ref=e13]:
+            - /url: /auth/register
+            - button "Get Started" [ref=e14] [cursor=pointer]
+    - generic [ref=e16]:
+      - heading "Your Mental Health Journey Starts Here" [level=1] [ref=e17]
+      - paragraph [ref=e18]: Track your mood, practice CBT exercises, and engage in therapeutic conversations with AI support. Take control of your mental wellness with compassionate technology.
+      - generic [ref=e19]:
+        - link "Start Your Journey" [ref=e20]:
+          - /url: /auth/register
+          - button "Start Your Journey" [ref=e21] [cursor=pointer]
+        - link "Learn More" [ref=e22]:
+          - /url: /dashboard
+          - button "Learn More" [ref=e23] [cursor=pointer]
+    - generic [ref=e25]:
+      - heading "Comprehensive Mental Health Support" [level=2] [ref=e26]
+      - generic [ref=e27]:
+        - generic [ref=e28]:
+          - generic [ref=e29]:
+            - img [ref=e30]
+            - heading "Mood Tracking" [level=3] [ref=e33]
+          - paragraph [ref=e35]: Monitor your emotional patterns with easy-to-use mood logging and trend analysis.
+        - generic [ref=e36]:
+          - generic [ref=e37]:
+            - img [ref=e38]
+            - heading "CBT Exercises" [level=3] [ref=e48]
+          - paragraph [ref=e50]: Practice evidence-based Cognitive Behavioral Therapy exercises tailored to your needs.
+        - generic [ref=e51]:
+          - generic [ref=e52]:
+            - img [ref=e53]
+            - heading "AI Conversations" [level=3] [ref=e58]
+          - paragraph [ref=e60]: Engage in supportive conversations with our AI therapist for guidance and reflection.
+        - generic [ref=e61]:
+          - generic [ref=e62]:
+            - img [ref=e63]
+            - heading "Personalized Care" [level=3] [ref=e65]
+          - paragraph [ref=e67]: Receive personalized recommendations and progress tracking for your mental wellness journey.
+    - generic [ref=e69]:
+      - heading "Ready to Prioritize Your Mental Health?" [level=2] [ref=e70]
+      - paragraph [ref=e71]: Join thousands of users who have taken the first step towards better mental wellness.
+      - link "Begin Your Journey Today" [ref=e72]:
+        - /url: /auth/register
+        - button "Begin Your Journey Today" [ref=e73] [cursor=pointer]
+    - contentinfo [ref=e74]:
+      - generic [ref=e75]:
+        - generic [ref=e76]:
+          - generic [ref=e77]:
+            - img [ref=e78]
+            - generic [ref=e80]: MindWell
+          - generic [ref=e81]:
+            - link "Privacy" [ref=e82]:
+              - /url: /privacy
+            - link "Terms" [ref=e83]:
+              - /url: /terms
+            - link "Support" [ref=e84]:
+              - /url: /support
+        - paragraph [ref=e86]: © 2024 MindWell. Your mental health matters.
+  - generic:
+    - generic [ref=e89] [cursor=pointer]:
+      - img [ref=e90]
+      - generic [ref=e92]: 1 error
+      - button "Hide Errors" [ref=e93]:
+        - img [ref=e94]
+    - status [ref=e97]:
+      - generic [ref=e98]:
+        - img [ref=e100]
+        - generic [ref=e102]:
+          - text: Static route
+          - button "Hide static indicator" [ref=e103] [cursor=pointer]:
+            - img [ref=e104]
+  - alert [ref=e107]
+```

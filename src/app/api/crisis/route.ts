@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
 // PUT /api/crisis/[id] - Update crisis event status
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -122,8 +122,9 @@ export async function PUT(
     const body = await request.json();
     const validatedData = updateCrisisEventSchema.parse(body);
 
+    const resolvedParams = await params;
     const existingEvent = await (prisma as any).crisisEvent.findUnique({
-      where: { id: params.id },
+      where: { id: resolvedParams.id },
     });
 
     if (!existingEvent) {
@@ -132,7 +133,7 @@ export async function PUT(
 
     // Update event
     const updatedEvent = await (prisma as any).crisisEvent.update({
-      where: { id: params.id },
+      where: { id: resolvedParams.id },
       data: {
         escalationStatus: validatedData.status,
         ...(validatedData.notes && {
@@ -158,7 +159,7 @@ export async function PUT(
     // Implement escalation actions based on status change
     if (validatedData.status === 'ESCALATED') {
       // Send notifications to crisis team
-      console.log(`Crisis event ${params.id} escalated. Notifying crisis team.`);
+      console.log(`Crisis event ${resolvedParams.id} escalated. Notifying crisis team.`);
       // TODO: Implement actual notification system (email, SMS, etc.)
 
       // Update user crisis flag if critical
@@ -175,11 +176,11 @@ export async function PUT(
         data: { crisisFlag: false }
       });
 
-      console.log(`Crisis event ${params.id} resolved. User crisis flag cleared.`);
+      console.log(`Crisis event ${resolvedParams.id} resolved. User crisis flag cleared.`);
     }
 
     // Log intervention actions
-    console.log(`Crisis event ${params.id} updated by ${session.user.id}: ${validatedData.status}`);
+    console.log(`Crisis event ${resolvedParams.id} updated by ${session.user.id}: ${validatedData.status}`);
 
     return NextResponse.json({
       event: {

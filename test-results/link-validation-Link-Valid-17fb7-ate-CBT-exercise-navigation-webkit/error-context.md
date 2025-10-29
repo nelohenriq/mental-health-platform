@@ -1,0 +1,46 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - navigation "breadcrumb" [ref=e4]:
+      - list [ref=e5]:
+        - listitem [ref=e6]:
+          - link "Home" [ref=e7]:
+            - /url: /
+            - img [ref=e8]
+            - text: Home
+        - listitem [ref=e11]:
+          - img [ref=e12]
+        - listitem [ref=e14]:
+          - link "CBT Exercises" [disabled] [ref=e15]:
+            - img [ref=e16]
+            - text: CBT Exercises
+  - generic [ref=e26]:
+    - generic [ref=e27]:
+      - heading "CBT Exercises" [level=1] [ref=e28]
+      - paragraph [ref=e29]: Cognitive Behavioral Therapy exercises to help you build healthier thought patterns and behaviors.
+    - generic [ref=e30]:
+      - generic [ref=e31]:
+        - heading "Completed Exercises" [level=3] [ref=e33]
+        - generic [ref=e35]: "0"
+      - generic [ref=e36]:
+        - heading "In Progress" [level=3] [ref=e38]
+        - generic [ref=e40]: "0"
+      - generic [ref=e41]:
+        - heading "Available Exercises" [level=3] [ref=e43]
+        - generic [ref=e45]: "0"
+    - generic [ref=e46]:
+      - tablist [ref=e47]:
+        - tab "Recommended" [selected] [ref=e48] [cursor=pointer]
+        - tab "All Exercises" [ref=e49] [cursor=pointer]
+        - tab "My Progress" [ref=e50] [cursor=pointer]
+      - tabpanel "Recommended" [ref=e51]:
+        - paragraph [ref=e54]: No CBT exercises available at the moment.
+  - generic [ref=e57] [cursor=pointer]:
+    - img [ref=e58]
+    - generic [ref=e60]: 1 error
+    - button "Hide Errors" [ref=e61]:
+      - img [ref=e62]
+  - alert [ref=e65]
+```

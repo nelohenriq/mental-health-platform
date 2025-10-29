@@ -15,14 +15,32 @@ export default function Home() {
               <h1 className="text-2xl font-bold text-gray-900">MindWell</h1>
             </div>
             <nav className="hidden md:flex space-x-6">
-              <Link href="/mood" className="text-gray-600 hover:text-blue-600">Mood Tracking</Link>
-              <Link href="/cbt" className="text-gray-600 hover:text-blue-600">CBT Exercises</Link>
-              <Link href="/conversations" className="text-gray-600 hover:text-blue-600">AI Chat</Link>
-              <Link href="/profile" className="text-gray-600 hover:text-blue-600">Profile</Link>
+              <Link href="/mood" className="text-gray-600 hover:text-blue-600">
+                Mood Tracking
+              </Link>
+              <Link href="/cbt" className="text-gray-600 hover:text-blue-600">
+                CBT Exercises
+              </Link>
+              <Link
+                href="/conversations"
+                className="text-gray-600 hover:text-blue-600"
+              >
+                AI Chat
+              </Link>
+              <Link
+                href="/profile"
+                className="text-gray-600 hover:text-blue-600"
+              >
+                Profile
+              </Link>
             </nav>
             <div className="flex space-x-2">
-              <Button variant="outline">Sign In</Button>
-              <Button>Get Started</Button>
+              <Link href="/auth/login">
+                <Button variant="outline">Sign In</Button>
+              </Link>
+              <Link href="/auth/register">
+                <Button>Get Started</Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -35,16 +53,21 @@ export default function Home() {
             Your Mental Health Journey Starts Here
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Track your mood, practice CBT exercises, and engage in therapeutic conversations
-            with AI support. Take control of your mental wellness with compassionate technology.
+            Track your mood, practice CBT exercises, and engage in therapeutic
+            conversations with AI support. Take control of your mental wellness
+            with compassionate technology.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="text-lg px-8 py-3">
-              Start Your Journey
-            </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8 py-3">
-              Learn More
-            </Button>
+            <Link href="/auth/register">
+              <Button size="lg" className="text-lg px-8 py-3">
+                Start Your Journey
+              </Button>
+            </Link>
+            <Link href="/dashboard">
+              <Button size="lg" variant="outline" className="text-lg px-8 py-3">
+                Learn More
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -63,7 +86,8 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600">
-                  Monitor your emotional patterns with easy-to-use mood logging and trend analysis.
+                  Monitor your emotional patterns with easy-to-use mood logging
+                  and trend analysis.
                 </p>
               </CardContent>
             </Card>
@@ -75,7 +99,8 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600">
-                  Practice evidence-based Cognitive Behavioral Therapy exercises tailored to your needs.
+                  Practice evidence-based Cognitive Behavioral Therapy exercises
+                  tailored to your needs.
                 </p>
               </CardContent>
             </Card>
@@ -87,7 +112,8 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600">
-                  Engage in supportive conversations with our AI therapist for guidance and reflection.
+                  Engage in supportive conversations with our AI therapist for
+                  guidance and reflection.
                 </p>
               </CardContent>
             </Card>
@@ -99,7 +125,8 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600">
-                  Receive personalized recommendations and progress tracking for your mental wellness journey.
+                  Receive personalized recommendations and progress tracking for
+                  your mental wellness journey.
                 </p>
               </CardContent>
             </Card>
@@ -114,11 +141,14 @@ export default function Home() {
             Ready to Prioritize Your Mental Health?
           </h2>
           <p className="text-xl mb-8 opacity-90">
-            Join thousands of users who have taken the first step towards better mental wellness.
+            Join thousands of users who have taken the first step towards better
+            mental wellness.
           </p>
-          <Button size="lg" variant="secondary" className="text-lg px-8 py-3">
-            Begin Your Journey Today
-          </Button>
+          <Link href="/auth/register">
+            <Button size="lg" variant="secondary" className="text-lg px-8 py-3">
+              Begin Your Journey Today
+            </Button>
+          </Link>
         </div>
       </section>
 
@@ -131,9 +161,15 @@ export default function Home() {
               <span className="text-xl font-bold">MindWell</span>
             </div>
             <div className="flex space-x-6">
-              <Link href="/privacy" className="text-gray-400 hover:text-white">Privacy</Link>
-              <Link href="/terms" className="text-gray-400 hover:text-white">Terms</Link>
-              <Link href="/support" className="text-gray-400 hover:text-white">Support</Link>
+              <Link href="/privacy" className="text-gray-400 hover:text-white">
+                Privacy
+              </Link>
+              <Link href="/terms" className="text-gray-400 hover:text-white">
+                Terms
+              </Link>
+              <Link href="/support" className="text-gray-400 hover:text-white">
+                Support
+              </Link>
             </div>
           </div>
           <div className="mt-8 pt-8 border-t border-gray-800 text-center text-gray-400">
